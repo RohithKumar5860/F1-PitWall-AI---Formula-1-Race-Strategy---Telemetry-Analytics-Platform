@@ -1,0 +1,63 @@
+# ──────────────────────────────────────────────────────────────────
+# F1 PitWall AI — .gitignore
+# ──────────────────────────────────────────────────────────────────
+
+# ── Python environment ────────────────────────────────────────────
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# ── Environment secrets ───────────────────────────────────────────
+.env
+
+# ── Testing & coverage ───────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.xml
+
+# ── Editors & IDEs ───────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── FastF1 & data cache ───────────────────────────────────────────
+data/cache/
+!data/cache/.gitkeep
+
+# ── Trained ML models ────────────────────────────────────────────
+trained_models/*.pkl
+trained_models/*.joblib
+trained_models/*.h5
+trained_models/*.pt
+trained_models/*.onnx
+
+# ── Logs ─────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Jupyter ───────────────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── Build artefacts ───────────────────────────────────────────────
+dist/
+build/
+*.egg-info/
+
+# ── OS generated ─────────────────────────────────────────────────
+ehthumbs.db
+desktop.ini
+
+# ── Do NOT ignore these ───────────────────────────────────────────
+# .env.example  — intentionally tracked
+# README.md     — intentionally tracked
+# requirements.txt — intentionally tracked

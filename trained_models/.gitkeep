@@ -1,0 +1,2 @@
+# trained_models/.gitkeep
+# Serialized ML model files (.pkl, .joblib) will be stored here. Git-ignored.
