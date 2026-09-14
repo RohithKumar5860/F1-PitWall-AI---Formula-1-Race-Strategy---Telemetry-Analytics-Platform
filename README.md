@@ -1,4 +1,4 @@
-# 🏎️ F1 PitWall AI — Formula 1 Race Strategy & Telemetry Analytics Platform
+# 🏎️ F1 PitWall AI - Formula 1 Race Strategy & Telemetry Analytics Platform
 
 An end-to-end **AI-powered Formula 1 race strategy and telemetry analytics platform** built with FastAPI, Streamlit, PostgreSQL, and FastF1. Provides real-time session analysis, tire degradation modelling, pit-stop strategy recommendations, and what-if race simulations.
 
