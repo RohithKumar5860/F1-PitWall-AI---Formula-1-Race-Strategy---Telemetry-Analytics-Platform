@@ -5,13 +5,12 @@ Streamlit User Authentication & Profile page.
 Calls FastAPI backend /auth/register, /auth/login, /auth/me endpoints.
 """
 
+import os
 import streamlit as st
 import requests
 from typing import Dict, Any
 
-from backend.utils.config import settings
-
-BASE_URL = settings.BACKEND_URL
+BASE_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
 
 
 def render_auth_page() -> None:
@@ -24,8 +23,9 @@ def render_auth_page() -> None:
         st.session_state["user_profile"] = None
 
     if st.session_state["jwt_token"]:
-        st.success(f"Logged in as **{st.session_state['user_profile']['username']}**")
-        st.json(st.session_state["user_profile"])
+        profile = st.session_state.get("user_profile") or {}
+        st.success(f"Logged in as **{profile.get('username', 'Unknown')}**")
+        st.json(profile)
 
         if st.button("🚪 LOG OUT", type="secondary"):
             st.session_state["jwt_token"] = None
@@ -46,13 +46,16 @@ def render_auth_page() -> None:
                 st.warning("Please enter username and password.")
             else:
                 try:
-                    res = requests.post(f"{BASE_URL}/auth/login", json={"username": username, "password": password}, timeout=5)
+                    res = requests.post(
+                        f"{BASE_URL}/auth/login",
+                        json={"username": username, "password": password},
+                        timeout=5,
+                    )
                     if res.status_code == 200:
                         token_data = res.json()
                         token = token_data["access_token"]
                         st.session_state["jwt_token"] = token
-                        
-                        # Fetch profile
+
                         headers = {"Authorization": f"Bearer {token}"}
                         prof_res = requests.get(f"{BASE_URL}/auth/me", headers=headers, timeout=5)
                         if prof_res.status_code == 200:
@@ -60,7 +63,10 @@ def render_auth_page() -> None:
                             st.success("Successfully authenticated!")
                             st.rerun()
                     else:
-                        st.error(f"Login failed: {res.json().get('detail', 'Invalid credentials')}")
+                        detail = "Invalid credentials"
+                        if "application/json" in res.headers.get("content-type", ""):
+                            detail = res.json().get("detail", detail)
+                        st.error(f"Login failed: {detail}")
                 except Exception as e:
                     st.error(f"Connection error: {str(e)}")
 
@@ -87,6 +93,9 @@ def render_auth_page() -> None:
                     if res.status_code in (200, 201):
                         st.success("Account created successfully! Switch to Log In tab.")
                     else:
-                        st.error(f"Registration failed: {res.json().get('detail', 'Error')}")
+                        detail = "Error"
+                        if "application/json" in res.headers.get("content-type", ""):
+                            detail = res.json().get("detail", detail)
+                        st.error(f"Registration failed: {detail}")
                 except Exception as e:
                     st.error(f"Connection error: {str(e)}")

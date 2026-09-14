@@ -6,6 +6,7 @@ Sidebar navigation component.
 
 import streamlit as st
 
+
 def render_sidebar() -> str:
     """Render sidebar and return selected page name."""
     with st.sidebar:
@@ -28,6 +29,7 @@ def render_sidebar() -> str:
             ("🏎️ Driver Classification", "Drivers"),
             ("⏱️ Lap Time Analysis", "Lap Time Analysis"),
             ("🛞 Tire Strategy", "Tire Strategy"),
+            ("🔬 Tyre Analysis", "Tyre Analysis"),
             ("🔧 Pit Stops", "Pit Stops"),
             ("⛅ Track Conditions", "Track Conditions"),
             ("⚔️ Driver Comparison", "Driver Comparison"),
@@ -48,4 +50,3 @@ def render_sidebar() -> str:
         st.markdown("---")
         st.caption("F1 PitWall AI v1.0.0 · Historical Data Analytics")
         return st.session_state["active_page"]
-

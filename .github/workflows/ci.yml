@@ -1,0 +1,51 @@
+name: "CI — Lint, Security & Tests"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-and-scan:
+    name: Test & Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Bandit security scan
+        run: |
+          bandit -r backend/ -ll -x backend/tests/ --format json -o bandit-report.json || true
+          bandit -r backend/ -ll -x backend/tests/
+
+      - name: Upload Bandit report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bandit-security-report
+          path: bandit-report.json
+
+      - name: Run Pytest
+        run: |
+          pytest backend/tests/ -v --tb=short
+        env:
+          APP_ENV: testing
+          DEBUG: "False"
+          FASTF1_CACHE_DIR: "data/cache"
+          SECRET_KEY: "ci-test-secret-key-for-pytest-only-32chars"
+          BACKEND_URL: "http://127.0.0.1:8000"

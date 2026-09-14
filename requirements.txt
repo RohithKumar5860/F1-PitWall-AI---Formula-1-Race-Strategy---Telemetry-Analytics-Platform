@@ -31,6 +31,10 @@ joblib>=1.4.0,<2.0.0
 plotly>=5.22.0,<6.0.0
 matplotlib>=3.9.0,<4.0.0
 
+# ── Plotly lowess trendlines (tire_analysis.py) ───────────────────
+# Required by plotly trendline="lowess" in tire_analysis.py scatter chart.
+statsmodels>=0.14.0,<1.0.0
+
 # ── Data validation & serialisation ──────────────────────────────
 pydantic>=2.7.0,<3.0.0
 pydantic-settings>=2.3.0,<3.0.0
@@ -43,11 +47,21 @@ bcrypt>=4.1.0,<5.0.0
 # ── Environment & configuration ──────────────────────────────────
 python-dotenv>=1.0.0,<2.0.0
 
-# ── HTTP client (frontend → backend health check) ────────────────
+# ── HTTP client (frontend → backend) ────────────────────────────
 requests>=2.31.0,<3.0.0
 httpx>=0.27.0,<1.0.0
+
+# ── FastAPI form data support ─────────────────────────────────────
+python-multipart>=0.0.9,<1.0.0
+
+# ── Parquet serialisation (preprocessing_service.py) ────────────
+# Required by preprocessing_service.py save_processed_data().
+pyarrow>=16.0.0,<20.0.0
 
 # ── Testing ───────────────────────────────────────────────────────
 pytest>=8.2.0,<9.0.0
 pytest-asyncio>=0.23.0,<1.0.0
 pytest-mock>=3.14.0,<4.0.0
+
+# ── Security scanning (CI pipeline) ──────────────────────────────
+bandit>=1.7.0,<2.0.0

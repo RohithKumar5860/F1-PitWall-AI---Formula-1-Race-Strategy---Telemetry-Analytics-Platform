@@ -30,17 +30,18 @@ from frontend.components.sidebar import render_sidebar
 from frontend.components.status_bar import render_status_bar
 from frontend.pages.dashboard import render_dashboard_page
 from frontend.pages.race_analytics import render_race_analytics_page
+from frontend.pages.tire_analysis import render_tire_analysis_page
+from frontend.pages.pitstops import render_pitstops_page
 from frontend.pages.about import render_about_page
 from frontend.pages.strategy_ai import render_strategy_ai_page
 from frontend.pages.simulator import render_simulator_page
 from frontend.pages.auth_ui import render_auth_page
 from frontend.pages.diagnostics import render_diagnostics_page
 
-# Pages that use the race analytics renderer
+# Pages that use the race analytics renderer (multi-tab view)
 RACE_ANALYTICS_PAGES = {
     "Lap Time Analysis",
     "Tire Strategy",
-    "Pit Stops",
     "Track Conditions",
     "Driver Comparison",
     "Drivers",
@@ -176,16 +177,41 @@ st.markdown("---")
 
 if active_page == "About":
     render_about_page()
+
 elif active_page == "Strategy AI":
     render_strategy_ai_page()
+
 elif active_page == "What-If Simulator":
     render_simulator_page()
+
 elif active_page == "Auth":
     render_auth_page()
+
 elif active_page == "Diagnostics":
     render_diagnostics_page()
+
+elif active_page == "Tyre Analysis":
+    # Dedicated Tyre Analysis page (tire_analysis.py)
+    if st.session_state["loaded_session"]:
+        render_tire_analysis_page(
+            laps=st.session_state["laps"],
+            tires=st.session_state["tires"],
+        )
+    else:
+        st.info("👈 Select a Season, Grand Prix, and Session above, then click **LOAD SESSION** to view tyre analysis.")
+
+elif active_page == "Pit Stops":
+    # Dedicated Pit Stops page (pitstops.py)
+    if st.session_state["loaded_session"]:
+        render_pitstops_page(
+            pitstops=st.session_state["pitstops"],
+            laps=st.session_state["laps"],
+        )
+    else:
+        st.info("👈 Select a Season, Grand Prix, and Session above, then click **LOAD SESSION** to view pit stop analysis.")
+
 elif active_page in RACE_ANALYTICS_PAGES:
-    # Dedicated race analytics pages (Lap Time Analysis, Tire Strategy, etc.)
+    # Multi-tab race analytics pages
     if st.session_state["loaded_session"]:
         render_race_analytics_page(
             laps=st.session_state["laps"],
@@ -194,6 +220,7 @@ elif active_page in RACE_ANALYTICS_PAGES:
         )
     else:
         st.info("👈 Select a Season, Grand Prix, and Session above, then click **LOAD SESSION** to view analytics.")
+
 else:
     # Dashboard (default) and any unmatched pages
     if st.session_state["loaded_session"]:
@@ -208,4 +235,3 @@ else:
         )
     else:
         st.info("👈 Select a Season, Grand Prix, and Session above, then click **LOAD SESSION** to view race analytics.")
-

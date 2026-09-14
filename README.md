@@ -1,177 +1,291 @@
-# 🏎️ F1 PITWALL AI — Intelligent Race Strategy & Decision Support Platform
+# 🏎️ F1 PitWall AI — Formula 1 Race Strategy & Telemetry Analytics Platform
 
-![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi)
-![Streamlit](https://img.shields.io/badge/Frontend-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit)
-![FastF1](https://img.shields.io/badge/Data-FastF1-E10600?style=for-the-badge&logo=formula1)
-![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-4169E1?style=for-the-badge&logo=postgresql)
-![Scikit-Learn](https://img.shields.io/badge/ML-Scikit--Learn-F7931E?style=for-the-badge&logo=scikitlearn)
-![Docker](https://img.shields.io/badge/Deployment-Docker-2496ED?style=for-the-badge&logo=docker)
-![Tests](https://img.shields.io/badge/Tests-33%20Passed-00E676?style=for-the-badge)
-
-> **F1 PitWall AI** is an end-to-end motorsport data engineering and decision support platform that processes Formula 1 telemetry, trains machine learning models to forecast lap-time degradation, evaluates optimal pit stop windows, and provides interactive "What-If" strategy simulations for race engineers.
+An end-to-end **AI-powered Formula 1 race strategy and telemetry analytics platform** built with FastAPI, Streamlit, PostgreSQL, and FastF1. Provides real-time session analysis, tire degradation modelling, pit-stop strategy recommendations, and what-if race simulations.
 
 ---
 
-## 📸 Interface Showcase
+## 📸 Features
 
-| Feature View | Description | Reference Link |
-|--------------|-------------|----------------|
-| **Race Dashboard** | Driver classification, standings, metric cards, & session summary | [View Specs](docs/screenshots/README.md#1-dashboard-overview) |
-| **Race Analytics** | Lap progression, inverted position evolution, sector heatmaps, & team IQR pace | [View Specs](docs/screenshots/README.md#2-advanced-race-analytics) |
-| **Tire Strategy** | Compound degradation curves, stint breakdowns, & tire age pace drop-off | [View Specs](docs/screenshots/README.md#3-tire-performance--stint-analysis) |
-| **Pit Stops** | Stint compound transitions (Sankey flow) & pit lap histograms | [View Specs](docs/screenshots/README.md#4-pit-stop-strategy--timeline) |
-| **Strategy AI** | Real-time pit window predictions & compound recommendations | [View Specs](docs/screenshots/README.md#5-ai-strategy-engine) |
-| **What-If Simulator** | Dual strategy scenario comparison (Plan A vs Plan B) | [View Specs](docs/screenshots/README.md#6-what-if-race-strategy-simulator) |
-| **Diagnostics** | Real-time API latency inspector & system health monitoring | [View Specs](docs/screenshots/README.md#7-system-diagnostics--telemetry-inspector) |
-
----
-
-## 🏗️ System Architecture
-
-```mermaid
-flowchart TD
-    FastF1["FastF1 Library / Ergast Telemetry API"] --> DataService["Data Collection & Disk Cache Service"]
-    DataService --> Preprocessing["Data Cleaning & Feature Engineering"]
-    Preprocessing --> FeatureStore["Feature Store (Parquet / PostgreSQL / SQLite)"]
-    FeatureStore --> MLModels["ML Predictive Pipeline (XGBoost, GradientBoosting, RandomForest)"]
-    MLModels --> StrategyEngine["AI Strategy & Simulation Engine"]
-    StrategyEngine --> FastAPI["FastAPI REST Backend API (Port 8000)"]
-    FastAPI --> Streamlit["Streamlit Motorsport User Interface (Port 8501)"]
-```
+| Feature | Description |
+|---|---|
+| **📊 Dashboard** | Interactive race overview with driver classification, lap times, tire stints, weather, and fastest laps |
+| **🏎️ Driver Classification** | Full session results with positions, grid slots, status, and points |
+| **⏱️ Lap Time Analysis** | Lap-by-lap timing progression with multi-driver comparison |
+| **🛞 Tire Strategy** | Stint timeline, compound usage, and team pace distribution |
+| **🔬 Tyre Analysis** | Dedicated degradation curves, compound stats, tire life distribution, and lowess trendlines |
+| **🔧 Pit Stops** | Pit stop history, compound transition Sankey diagrams, and pit window distribution |
+| **⛅ Track Conditions** | Air/track temperature and wind speed evolution charts |
+| **⚔️ Driver Comparison** | Head-to-head fastest lap, average pace, and compound usage comparison |
+| **🤖 Strategy AI** | Rule-based pit-stop recommendation engine with compound and urgency analysis |
+| **🎮 What-If Simulator** | Side-by-side strategy comparison with estimated race times and pit stop loss |
+| **🔐 Authentication** | JWT-based user registration, login, and profile (DB or in-memory fallback) |
+| **📈 Advanced Analytics** | Position evolution, sector heatmaps, team pace boxplots, consistency analysis, long-run stint metrics |
 
 ---
 
-## ⚙️ Key Technical Components
+## 🛠️ Tech Stack
 
-### 1. Data Collection & Caching
-- Integrates `FastF1` library to query official F1 timing, sector times, compound telemetry, pit stop history, and weather observations.
-- Local disk caching layer (`data/cache/`) prevents unnecessary API calls and enables offline operation.
-
-### 2. Preprocessing & Feature Engineering
-- Removes warm-up/cool-down out-laps, safety car laps, and telemetry noise.
-- Generates rolling pace metrics (`RollingMeanPace_3`, `RollingMeanPace_5`, `RollingMeanPace_10`).
-- Computes stint degradation rates, fuel load linear corrections, and exports cleaned datasets in **Parquet** format.
-
-### 3. Machine Learning Models
-- **`LapTimeModel` (XGBoost)**: Predicts baseline expected lap times based on fuel load, compound, tire age, and track temperature.
-- **`TireDegradationModel` (GradientBoosting)**: Estimates lap-by-lap pace degradation per compound across extended stints.
-- **`PitWindowModel` (RandomForest)**: Predicts optimal pit stop window (laps remaining) with ensemble confidence intervals.
-- *Detailed specification available in [Model Documentation Card](docs/models.md).*
-
-### 4. AI Strategy Engine & What-If Simulator
-- Hybrid rule-based & ML decision engine considering track temperature, degradation slope, safety car probabilities, and wet weather transitions.
-- Scenario comparison simulator projecting total race times and stint deltas between alternative strategies (e.g. 1-Stop Medium-Hard vs 2-Stop Soft-Medium-Hard).
-
-### 5. Production API & Dashboard
-- **FastAPI Backend**: Provides 25 OpenAPI REST endpoints, JWT authentication, and structured error handling. *See [REST API Documentation](docs/api.md).*
-- **Streamlit Frontend**: Custom dark motorsport UI (`#0d0d0d` background, `#E10600` red accents, responsive Plotly charts, KPI metric cards, and CSV export).
+| Layer | Technology |
+|---|---|
+| **Backend API** | FastAPI (Python 3.12+) |
+| **Frontend** | Streamlit |
+| **Database** | PostgreSQL 16 (optional — runs without DB) |
+| **F1 Data** | FastF1 (official F1 timing data) |
+| **ML Models** | Scikit-Learn, XGBoost (lap time, tire degradation, pit window prediction) |
+| **Visualisation** | Plotly, Matplotlib |
+| **Auth** | PyJWT + bcrypt |
+| **Deployment** | Docker Compose |
+| **CI/CD** | GitHub Actions (CodeQL, Microsoft Defender for DevOps, Bandit, Pytest) |
 
 ---
 
-## 🚀 Quickstart & Installation
+## 🚀 Quick Start
 
-### Option A: Local Development Setup
+### Prerequisites
+- Python 3.12+
+- pip
+- (Optional) Docker & Docker Compose
+- (Optional) PostgreSQL 16
 
-#### 1. Clone & Set Up Environment
+### 1. Clone & Setup
+
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/f1-pitwall-ai.git
-cd f1-pitwall-ai
+git clone https://github.com/YourUsername/F1-PitWall-AI---Formula-1-Race-Strategy---Telemetry-Analytics-Platform.git
+cd F1-PitWall-AI---Formula-1-Race-Strategy---Telemetry-Analytics-Platform
 
-# Create Python virtual environment
+# Create virtual environment
 python -m venv venv
-
-# Activate environment (Windows PowerShell)
-.\venv\Scripts\Activate.ps1
-
-# Activate environment (Linux / macOS)
+# Windows
+venv\Scripts\activate
+# macOS/Linux
 source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 ```
 
-#### 2. Run Backend API Server
-```bash
-uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
-```
-*Backend interactive docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)*
+### 2. Configure Environment
 
-#### 3. Run Streamlit Frontend Dashboard
-In a separate terminal:
 ```bash
-streamlit run frontend/app.py --server.address 0.0.0.0
+# Copy example config and fill in real values
+cp .env.example .env
 ```
-*Frontend UI: [http://localhost:8501](http://localhost:8501)*
+
+**Required:** Generate a secure `SECRET_KEY`:
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+Edit `.env` and set at minimum:
+- `SECRET_KEY` — paste the generated key
+- `DATABASE_URL` — (optional) PostgreSQL connection string
+
+### 3. Start the Backend
+
+```bash
+uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+API docs available at: http://127.0.0.1:8000/docs
+
+### 4. Start the Frontend
+
+```bash
+streamlit run frontend/app.py
+```
+
+Open http://localhost:8501 in your browser.
+
+### 5. Load Race Data
+
+1. Select a **Season** (2018–2025), **Grand Prix**, and **Session** (R, Q, FP1, etc.)
+2. Click **🚀 LOAD SESSION**
+3. Navigate through Dashboard, Drivers, Lap Times, Tire Analysis, Pit Stops, etc.
 
 ---
 
-### Option B: Docker Compose Container Deployment
-
-Deploy PostgreSQL database, FastAPI backend, and Streamlit frontend in containerized environment:
+## 🐳 Docker Deployment
 
 ```bash
-# Build and launch all services
-docker compose up --build
+# Set required environment variables
+export POSTGRES_PASSWORD=your_strong_db_password
+export SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
+
+# Build and run all services
+docker compose up --build -d
 ```
 
-Services exposed:
-- **Streamlit Dashboard**: `http://localhost:8501`
-- **FastAPI REST Service**: `http://localhost:8000`
-- **PostgreSQL Database**: `localhost:5432`
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:8501 |
+| Backend API | http://localhost:8000 |
+| API Docs | http://localhost:8000/docs |
+| PostgreSQL | localhost:5432 |
 
 ---
 
-## 🗄️ Database Migrations (PostgreSQL / Alembic)
+## 📁 Project Structure
 
-Initialize database schema and apply migrations:
-
-```bash
-# Run database migrations to latest revision
-alembic upgrade head
-
-# Sync historical session telemetry into database
-python -c "from backend.services.db_service import sync_session_to_db; sync_session_to_db(2024, 'Bahrain Grand Prix', 'R')"
+```
+├── backend/
+│   ├── api/              # FastAPI routers (f1, analytics, strategy, simulation, auth, db, ml, export)
+│   ├── database/         # SQLAlchemy connection, Base, session factory
+│   ├── ml/               # ML model classes (LapTime, TireDegradation, PitWindow)
+│   ├── models/           # ORM models (User, F1 models)
+│   ├── schemas/          # Pydantic request/response models
+│   ├── services/         # Business logic (f1_data, auth, ml, preprocessing, db, export)
+│   ├── simulation/       # What-if race simulator engine
+│   ├── strategy/         # Rule-based strategy recommendation engine
+│   ├── tests/            # Pytest test suite
+│   ├── utils/            # Config, logger utilities
+│   └── main.py           # FastAPI application entry point
+├── frontend/
+│   ├── components/       # Sidebar, header, metric cards, status bar
+│   ├── pages/            # All Streamlit pages (dashboard, analytics, tire, pitstops, etc.)
+│   ├── utils/            # API client, formatting helpers
+│   └── app.py            # Streamlit application entry point
+├── data/                 # FastF1 cache & processed data
+├── trained_models/       # Serialised ML model files
+├── alembic/              # Database migration scripts
+├── .github/workflows/    # CI/CD (CodeQL, MSDO, Bandit + Pytest)
+├── docker-compose.yml    # Multi-container deployment
+├── Dockerfile            # Backend container
+├── Dockerfile.frontend   # Frontend container
+├── requirements.txt      # Python dependencies
+└── .env.example          # Environment configuration template
 ```
 
 ---
 
-## 🤖 Model Training & Verification
+## 🔌 API Endpoints
 
-Train all machine learning models on session telemetry:
+### Formula One Data (`/f1`)
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/f1/seasons` | List available seasons |
+| GET | `/f1/seasons/{year}/schedule` | Event schedule for a season |
+| GET | `/f1/session/summary` | Session metadata |
+| GET | `/f1/session/drivers` | Driver classification |
+| GET | `/f1/session/laps` | Lap timing data |
+| GET | `/f1/session/tires` | Tire compound data |
+| GET | `/f1/session/pitstops` | Pit stop transitions |
+| GET | `/f1/session/weather` | Weather telemetry |
+| POST | `/f1/session/preprocess` | Run feature engineering pipeline |
+
+### Analytics (`/analytics`)
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/analytics/lap-comparison` | Compare lap times between drivers |
+| GET | `/analytics/sector-analysis` | Sector time breakdown |
+| GET | `/analytics/position-changes` | Position evolution data |
+| GET | `/analytics/pace-distribution` | Pace statistics per driver |
+| GET | `/analytics/degradation-summary` | Tire degradation rates per compound |
+| GET | `/analytics/team-pace-comparison` | Team/constructor pace comparison |
+| GET | `/analytics/long-run-analysis` | Stint degradation analysis |
+| GET | `/analytics/consistency-analysis` | Driver lap time consistency |
+| GET | `/analytics/tire-degradation-curves` | Degradation curve data |
+| GET | `/analytics/pit-stop-timeline` | Pit stop timeline records |
+
+### Strategy (`/strategy`)
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/strategy/recommend` | Get pit-stop strategy recommendation |
+| GET | `/strategy/compounds` | Compound performance reference data |
+
+### Simulation (`/simulation`)
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/simulation/compare` | Compare two race strategies |
+
+### Machine Learning (`/ml`)
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/ml/models` | ML models status & metrics |
+| POST | `/ml/train` | Train all ML models |
+| POST | `/ml/predict/lap-time` | Predict lap time (XGBoost) |
+| POST | `/ml/predict/tire-degradation` | Predict tire degradation |
+| POST | `/ml/predict/pit-window` | Predict optimal pit window |
+
+### Auth (`/auth`)
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/auth/register` | Register new user |
+| POST | `/auth/login` | Login and get JWT token |
+| GET | `/auth/me` | Get current user profile |
+
+### System & Health (`/`)
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/` | API welcome and version info |
+| GET | `/health` | Health-check endpoint |
+| GET | `/status` | Component status (backend, FastF1, database) |
+
+### Database & Storage (`/db`)
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/db/status` | Database connectivity and table counts |
+| POST | `/db/sync/session` | Persist FastF1 session data to database |
+
+### Export (`/export`)
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/export/csv` | Export session laps or telemetry as CSV |
+| GET | `/export/json` | Export session laps or telemetry as JSON |
+
+---
+
+## 🧪 Testing
 
 ```bash
-# Execute ML training script
-python scripts/train_models.py
-```
+# Run unit tests
+pytest backend/tests/ -v
 
-Run test suite:
-
-```bash
-# Run full pytest suite (33 tests)
-pytest -v
+# Security scan
+bandit -r backend/ -ll -x backend/tests/
 ```
 
 ---
 
-## ⚠️ Known Limitations & Responsible AI Disclosures
+## 🔒 Security
 
-> [!NOTE]
-> - **Decision Support Scope**: F1 PitWall AI is an open-source educational platform developed for sports analytics research and strategy visualization.
-> - **Public Telemetry Reliance**: Models are trained on public telemetry datasets from FastF1/Ergast API. They do not utilize proprietary team secrets, wind tunnel data, or real-time car telemetry.
-> - **Safety Car Anomalies**: Laps impacted by Safety Car (SC), Virtual Safety Car (VSC), or Red Flags introduce artificial pace reductions; the preprocessing pipeline filters out these laps to preserve clean training features.
-> - **Report Export**: Strategy reports generate formatted HTML documents with native print-to-PDF formatting support.
+- **JWT Authentication** with bcrypt password hashing
+- **SECRET_KEY** loaded from environment (never hardcoded)
+- **CORS** origins configurable via `CORS_ORIGINS` env var
+- **Database credentials** injected via environment variables (no defaults in Docker)
+- **CI/CD Security**: CodeQL analysis, Microsoft Defender for DevOps, Bandit SAST scanning
+- **Parameterized queries** via SQLAlchemy ORM (no raw SQL injection risk)
 
 ---
 
-## 🔮 Future Roadmap
+## 📊 Machine Learning Models
 
-- [ ] Real-time WebSocket live timing telemetry ingestion during live sessions.
-- [ ] Track surface rubber-in progression forecasting.
-- [ ] Driver aggressiveness and overtake difficulty clustering models.
+| Model | Algorithm | Target | Features |
+|---|---|---|---|
+| Lap Time Predictor | XGBoost | Predicted lap time (s) | Tire life, compound, lap number, fuel correction, stint |
+| Tire Degradation | GradientBoosting | Pace loss per lap (s) | Compound, tire life, stint, lap number |
+| Pit Window | RandomForest | Optimal laps until pit | Compound, tire life, current lap, remaining laps, recent pace, pace dropoff |
+
+Train all models via the API:
+```bash
+curl -X POST http://127.0.0.1:8000/ml/train
+```
 
 ---
 
 ## 📜 License
 
-Distributed under the MIT License. See `LICENSE` for details.
+This project is for educational and research purposes. F1 timing data is provided by the FastF1 library under its own license terms.
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+*Built with ❤️ for Formula 1 data analytics*

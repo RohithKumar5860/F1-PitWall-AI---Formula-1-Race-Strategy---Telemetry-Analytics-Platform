@@ -8,7 +8,8 @@ imported wherever configuration is needed.
 """
 
 import os
-from typing import Optional
+import warnings
+from typing import Optional, List
 
 from dotenv import load_dotenv
 
@@ -40,9 +41,23 @@ class Settings:
     # ------------------------------------------------------------------ #
     # Security & JWT                                                       #
     # ------------------------------------------------------------------ #
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "change-me-in-production-use-32-plus-bytes!!")
+    # SECRET_KEY must be at least 32 random characters for HMAC-SHA256.
+    # Generate with: python -c "import secrets; print(secrets.token_hex(32))"
+    # WARNING: Never commit a real secret key. Set SECRET_KEY in your .env file.
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "")
     JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
     JWT_EXPIRE_MINUTES: int = int(os.getenv("JWT_EXPIRE_MINUTES", "1440"))
+
+    # ------------------------------------------------------------------ #
+    # CORS                                                                 #
+    # ------------------------------------------------------------------ #
+    # Comma-separated list of allowed origins. Use "*" for development only.
+    # Example: CORS_ORIGINS=http://localhost:8501,http://127.0.0.1:8501
+    CORS_ORIGINS: List[str] = [
+        o.strip()
+        for o in os.getenv("CORS_ORIGINS", "*").split(",")
+        if o.strip()
+    ]
 
     # ------------------------------------------------------------------ #
     # FastF1 / Data                                                        #
@@ -59,6 +74,16 @@ class Settings:
         f"http://{os.getenv('BACKEND_HOST', '127.0.0.1')}:{os.getenv('BACKEND_PORT', '8000')}",
     )
 
+    def __post_init_warnings(self) -> None:
+        """Emit warnings for insecure configuration detected at startup."""
+        if not self.SECRET_KEY:
+            warnings.warn(
+                "SECRET_KEY is not set. JWT authentication will use an empty key. "
+                "Set SECRET_KEY in your .env file before using auth endpoints.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+
     def __repr__(self) -> str:  # pragma: no cover
         return (
             f"<Settings app={self.APP_NAME!r} env={self.APP_ENV!r} "
@@ -68,3 +93,5 @@ class Settings:
 
 # Single shared instance — import this everywhere.
 settings = Settings()
+# Emit configuration warnings on startup
+settings.__post_init_warnings()

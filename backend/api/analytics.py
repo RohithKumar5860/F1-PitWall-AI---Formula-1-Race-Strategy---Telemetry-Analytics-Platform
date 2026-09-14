@@ -6,6 +6,7 @@ FastAPI router for advanced race analytics endpoints.
 
 from typing import Optional, List, Dict, Any
 from fastapi import APIRouter, HTTPException, Query, status
+import numpy as np
 
 from backend.services.f1_data_service import get_lap_data, get_driver_classification
 from backend.utils.logger import get_logger

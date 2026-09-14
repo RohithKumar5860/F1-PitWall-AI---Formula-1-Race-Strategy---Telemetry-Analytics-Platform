@@ -75,9 +75,10 @@ app.include_router(ml_router)
 app.include_router(export_router)
 
 # Allow the Streamlit frontend (running on a different port) to reach the API.
+# Configure CORS_ORIGINS env var to restrict origins in production.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],       # Tighten in production.
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
